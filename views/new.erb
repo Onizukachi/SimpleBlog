@@ -1,0 +1,10 @@
+<h2>Add New Post</h2>
+<p>  
+    <%# action обязательно указываем, и показываем куда отправлять данные, в нашем случае на этот же url%>
+    <form action="/new" method="POST" role="form">
+        <%# Добавляем атрибут name, которое присвоится этому textarea, чтобы потом к нему обратиться в params %>
+        <textarea name="content" class="form-control" rows="6" placeholder="Введите текст"></textarea>
+        <br />
+        <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</p>
