@@ -20,7 +20,17 @@ configure do
 	init_rb
 	@db.execute 'CREATE TABLE IF NOT EXISTS Post 
 	(
-		"id" INTEGER PRIMARY KEY AUTOINCREMENT, "created_date" DATE, "content" TEXT
+		id INTEGER PRIMARY KEY AUTOINCREMENT, 
+		created_date DATE, 
+		content TEXT
+	)'
+		#post_id это привязка комментария к посту
+	@db.execute 'CREATE TABLE IF NOT EXISTS Comments
+	(
+		id INTEGER PRIMARY KEY AUTOINCREMENT, 
+		created_date DATE, 
+		content TEXT,
+		post_id INTEGER
 	)'
 end
 
@@ -53,16 +63,51 @@ post '/new' do
 	
 	#перенаправление на главную страницу
 	redirect to '/'
-  end
+end
 
-  #Вывод информации о посте
-  #Универсальный обработчик для всех постов, преобразует все что после / в нашу переменную, и дальше делаем что хотим
-  get '/details/:post_id' do
+#Вывод информации о посте
+#Универсальный обработчик для всех постов, преобразует все что после / в нашу переменную, и дальше делаем что хотим
+get '/details/:post_id' do
+
+	#Получаем переменную из URL(она динамическая, в зависимости от id комментария)
 	post_id = params[:post_id]
 
+	#Получаем список постов (у нас будет только 1 пост)
 	results = @db.execute 'select * from Post where id = ?', [post_id]
-	#Выбираем только одну строчку
+		
+	#Выбираем только этот один пост в переменную @row
 	@row = results[0]
 
+	#Выбираем комментарий для нашего поста
+	@comments = @db.execute 'select * from Comments where post_id = ? order by id', [post_id]
+	
+	#Возвращаем предтсавление
 	erb :details
-  end
+end
+
+#обработчик post запроса 
+#браузер отправляет данные на сервер, мы их принимаем
+post '/details/:post_id' do
+	
+	#Получаем переменную из URL
+	post_id = params[:post_id]
+
+	#Получаем переменную из POST запроса
+	content = params[:content]
+
+	@db.execute 'insert into Comments 
+	(
+		content, 
+		created_date, 
+		post_id
+	) 
+		values 
+	(
+		?,
+		datetime(),
+		?
+	)', [content, post_id]
+
+	#Перенаправляем на страницу поста
+	redirect  to ('/details/' + post_id)
+end

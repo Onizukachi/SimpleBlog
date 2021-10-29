@@ -6,3 +6,24 @@
     <br />
     Added at <%= @row['created_date'] %>
 </p>
+<br>
+<h4>Comments:<h4>
+<br />
+<% @comments.each do |comment| %>
+    <p>
+        <%= comment['content'] %>
+        <br />
+        <br />
+        <span style="font-size: 75%; color: #999">Added at <%= comment['created_date'] %></span>
+    </p>
+    <hr />
+<% end %>
+<p>
+    <form action="/details/<%= @row['id'] %>" method="POST" role="form">
+        <%# Добавляем атрибут name, которое присвоится этому textarea, чтобы потом к нему обратиться в params %>
+        <textarea name="content" class="form-control" rows="6" placeholder="Введите комментарий"></textarea>
+        <br />
+        <button type="submit" class="btn btn-primary">Add comment</button>
+</form>
+</p>
+
